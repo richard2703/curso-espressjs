@@ -1,0 +1,19 @@
+{
+  "name": "curso-espressjs",
+  "version": "1.0.0",
+  "description": "esto es una prueba para la info",
+  "main": "index.js",
+  "scripts": {
+    "dev": "node --watch app.js",
+    "start": "node app.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "Ricardo rios",
+  "license": "MIT",
+  "dependencies": {
+    "body-parser": "^2.2.0",
+    "dotenv": "^17.2.1",
+    "express": "^5.1.0"
+  }
+}
