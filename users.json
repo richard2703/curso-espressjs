@@ -1,0 +1,23 @@
+[
+  {
+    "id": 1,
+    "name": "maria ",
+    "email": "johndoe2019@gmail.com",
+    "apellido": "de la torre"
+  },
+  {
+    "id": 2,
+    "name": "Jenny Smith",
+    "email": "jenny2025@gmail.com"
+  },
+  {
+    "id": 3,
+    "name": "maria ",
+    "email": "johndoe2019@gmail.com"
+  },
+  {
+    "id": 5,
+    "name": "John Doe",
+    "email": "johndoe2019@gmail.com"
+  }
+]
