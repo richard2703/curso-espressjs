@@ -20,10 +20,10 @@ function validateUser(user, users) {
     };
   }
   if (!isValidEmail(email)) {
-    return { isValid: false, error: 'El correo electrÃ³nico no es vÃ¡lido.' };
+    return { isValid: false, error: 'El email no es valido.' };
   }
   if (!isUniqueNumericId(id, users)) {
-    return { isValid: false, error: 'El ID debe ser numÃ©rico y Ãºnico.' };
+    return { isValid: false, error: 'El ID debe ser mumerico y unico.' };
   }
   return { isValid: true };
 }

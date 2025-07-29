@@ -1,6 +1,8 @@
 require('dotenv').config();
 const express = require('express');
 
+const LoggerMiddleware  = require('./middlewares/loggers');
+const errorHandler = require('./middlewares/errorHandler');
 const {validateUser} = require('./utils/validations');
 
 const bodyParser = require('body-parser');
@@ -12,13 +14,14 @@ const usersFilePath = path.join(__dirname,'users.json');
 const app = express();
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
+app.use(LoggerMiddleware);
+app.use(errorHandler);
 
 const PORT = process.env.PORT || 3000;
-console.log(`El puerto es: ${PORT}`);
 
 app.get('/', (req, res) => {
   res.send(`
-      <h1>Curso Express.js V3</h1>jy
+      <h1>Curso Express.js V3</h1>
       <p>Esto es una aplicación node.js con express.js</p>
       <p>Corre en el  puerto: ${PORT}</p>
     `);
@@ -125,6 +128,27 @@ app.put('/users/:id', (req, res) => {
       res.json(updatedUser);
     });
   });
+});
+
+app.delete('/users/:id', (req, res) => {
+  const userId = parseInt(req.params.id, 10);
+  fs.readFile(usersFilePath, 'utf-8', (err, data) => {
+    if (err) {
+      return res.status(500).json({ error: 'Error con conexion de datos.' });
+    }
+    let users = JSON.parse(data);
+    users = users.filter(user => user.id !== userId);
+    fs.writeFile(usersFilePath, JSON.stringify(users, null, 2), err => {
+      if (err) {
+        return res.status(500).json({ error: 'Error al eliminar el usuario.' });
+      }
+      res.status(204).send();
+    });
+  });
+});
+
+app.get('/error', (req, res, next) => {
+  next (new Error('Este es un error de prueba'));
 });
 
 app.listen(PORT, () => {
