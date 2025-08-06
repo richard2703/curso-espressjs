@@ -1,0 +1,46 @@
+# services:
+#   postgres:
+#     image: postgres:latest
+#     environment:
+#       POSTGRES_USER: user
+#       POSTGRES_PASSWORD: password
+#       POSTGRES_DB: mydatabase
+#     ports:
+#       - "5432:5432"
+#     volumes:
+#       - postgres_data:/var/lib/postgresql/data
+
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:latest
+    container_name: postgres_container
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: mydatabase
+      # Opcional: Configuración adicional para performance
+      POSTGRES_HOST_AUTH_METHOD: trust  # Solo para desarrollo
+      # PGDATA: /var/lib/postgresql/data/pgdata  # Si necesitas customizar la ruta de datos
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      # Opcional: Si necesitas ejecutar scripts SQL al iniciar
+      # - ./init-scripts:/docker-entrypoint-initdb.d/
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U user -d mydatabase"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    # Opcional: Configuración de recursos
+    # deploy:
+    #   resources:
+    #     limits:
+    #       cpus: '0.5'
+    #       memory: 512M
+
+volumes:
+  postgres_data:

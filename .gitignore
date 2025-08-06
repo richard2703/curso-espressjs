@@ -141,4 +141,8 @@ dist
 # SvelteKit build / generate output
 .svelte-kit
 
+# quitamos la base de datos de postgres
+postgres_data
+
 # End of https://www.toptal.com/developers/gitignore/api/node
+/generated/prisma

@@ -1,9 +1,12 @@
 require('dotenv').config();
 const express = require('express');
+const { PrismaClient } = require('./generated/prisma');
+const prisma = new PrismaClient();
 
 const LoggerMiddleware  = require('./middlewares/loggers');
 const errorHandler = require('./middlewares/errorHandler');
 const {validateUser} = require('./utils/validations');
+const authenticateToken = require('./middlewares/auth');
 
 const bodyParser = require('body-parser');
 
@@ -149,6 +152,20 @@ app.delete('/users/:id', (req, res) => {
 
 app.get('/error', (req, res, next) => {
   next (new Error('Este es un error de prueba'));
+});
+
+app.get('/db-users', async (req, res) => {
+  try {
+    const users = await prisma.user.findMany();
+    res.json(users);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Error al obtener los usuarios.' });
+  }
+});
+
+app.get('/protected-route', authenticateToken, (req, res) => {
+  res.json({ message: 'Ruta protegida' });
 });
 
 app.listen(PORT, () => {
