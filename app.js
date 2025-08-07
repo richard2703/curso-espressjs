@@ -1,12 +1,11 @@
 require('dotenv').config();
 const express = require('express');
-const { PrismaClient } = require('./generated/prisma');
-const prisma = new PrismaClient();
 
-const LoggerMiddleware  = require('./middlewares/loggers');
-const errorHandler = require('./middlewares/errorHandler');
-const {validateUser} = require('./utils/validations');
-const authenticateToken = require('./middlewares/auth');
+
+const LoggerMiddleware  = require('./src/middlewares/loggers');
+const errorHandler = require('./src/middlewares/errorHandler');
+const {validateUser} = require('./src/utils/validations');
+const authenticateToken = require('./src/middlewares/auth');
 
 const bodyParser = require('body-parser');
 
@@ -166,6 +165,46 @@ app.get('/db-users', async (req, res) => {
 
 app.get('/protected-route', authenticateToken, (req, res) => {
   res.json({ message: 'Ruta protegida' });
+});
+
+app.post('/register', async (req, res) => {
+  const { email, password, name } = req.body;
+  const hashedPassword = await bcrypt.hash(password, 10);
+  try {
+    const newUser = await prisma.user.create({
+      data: {
+        email,
+        password: hashedPassword,
+        name,
+        role: 'User'
+      }
+    });
+    res.status(201).json({message: 'Usuario registrado correctamente', newUser});
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Error al registrar el usuario.' });
+  }
+});
+
+app.post('/login', async (req, res) => {
+  const { email, password } = req.body;
+  // return res.json({email, password});
+  try {
+    const user = await prisma.user.findUnique({ where: { email } });
+    if (!user) {
+      return res.status(401).json({ error: 'Credenciales incorrectas.' });
+    }
+    const isPasswordValid = await bcrypt.compare(password, user.password);
+    if (!isPasswordValid) {
+      return res.status(401).json({ error: 'Credenciales incorrectas.' });
+    }
+    const token = jwt.sign({ id: user.id, role: user.role }, process.env.JWT_SECRET, { expiresIn: '4h' });
+    res.json({ token });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Error al iniciar sesión.' , });
+  }
+
 });
 
 app.listen(PORT, () => {
