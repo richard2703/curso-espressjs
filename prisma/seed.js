@@ -2,22 +2,56 @@ const { PrismaClient} = require('../generated/prisma');
 const prisma = new PrismaClient();
 
 async function main() {
+  // Crear usuarios
+  const user1 = await prisma.user.create({
+    data: {
+      email: 'user1@example.com',
+      password: 'password123',
+      name: 'User One',
+      role: 'User'
+    }
+  });
 
-  const demoUsers = [
-    { name: 'Juan Pérez', email: 'juan.perez@example.com' },
-    { name: 'María López', email: 'maria.lopez@example.com' },
-    { name: 'Carlos García', email: 'carlos.garcia@example.com' }
-  ];
+  const user2 = await prisma.user.create({
+    data: {
+      email: 'admin@example.com',
+      password: 'admin123',
+      name: 'Admin User',
+      role: 'Admin'
+    }
+  });
 
-  for (const user of demoUsers) {
-    await prisma.user.create({
-      data: user
-    });
-  }
+  // Crear bloques de tiempo
+  const timeBlock1 = await prisma.timeBlock.create({
+    data: {
+      startTime: new Date('2023-10-01T09:00:00Z'),
+      endTime: new Date('2023-10-01T10:00:00Z')
+    }
+  });
 
-  console.log('Usuarios de demostración creados con éxito');
+  const timeBlock2 = await prisma.timeBlock.create({
+    data: {
+      startTime: new Date('2023-10-01T10:00:00Z'),
+      endTime: new Date('2023-10-01T11:00:00Z')
+    }
+  });
 
-//   await prisma.user.deleteMany();
+  // Crear citas
+  await prisma.appointment.create({
+    data: {
+      date: new Date('2023-10-01T09:00:00Z'),
+      user: { connect: { id: user1.id } },
+      timeBlock: { connect: { id: timeBlock1.id } }
+    }
+  });
+
+  await prisma.appointment.create({
+    data: {
+      date: new Date('2023-10-01T10:00:00Z'),
+      user: { connect: { id: user2.id } },
+      timeBlock: { connect: { id: timeBlock2.id } }
+    }
+  });
 }
 
 main()
